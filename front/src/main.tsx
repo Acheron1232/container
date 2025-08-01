@@ -7,6 +7,7 @@ import {AuthProvider} from "react-oidc-context";
 
 const CLIENT_ID = "public-client";
 const AUTHSERVERURL = "http://127.0.0.1:9000";
+// const AUTHSERVERURL = "http://localhost:8080/auth";
 const HOST_URL = window.location.origin;
 
 const oidcConfig: UserManagerSettings = {
@@ -15,7 +16,17 @@ const oidcConfig: UserManagerSettings = {
     redirect_uri: HOST_URL + "/callback",
     response_type: "code",
     scope: "openid profile email",
-    userStore: new WebStorageStateStore({store: window.localStorage})
+    userStore: new WebStorageStateStore({store: window.localStorage}),
+    extraQueryParams: {
+        prompt: "login"
+    }
+    // metadata:{
+    //     end_session_endpoint: "http://127.0.0.1:9000/connect/logout"
+    // }
+    // metadata: {
+    //     authorization_endpoint: "http://127.0.0.1:9000/oauth2/authorize"
+    // },
+
 };
 
 createRoot(document.getElementById("root")!).render(

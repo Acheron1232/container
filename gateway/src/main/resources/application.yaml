@@ -1,33 +1,90 @@
 spring:
-  # ... other configuration
-  platform-auth-server:
-    issuer-uri: http://127.0.0.1:9000
   cloud:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://localhost:5173"
+                allowedOriginPatterns:
+                  - "*"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - "*"
+                exposedHeaders:
+                  - "Set-Cookie"
+                  - "X-XSRF-TOKEN"
+                  - "Authorization"
+                allowCredentials: true
+
+
           routes:
             - id: book-service
               uri: http://localhost:8081
               predicates:
                 - Path=/books/**
+            #              metadata:
+            #                cors:
+            #                  allowedOrigins:
+            #                    - "http://localhost:5173"
+            #                    - "http://localhost"
+            #                    - "http://127.0.0.1:9000"
+            #                    - "https://localhost"
+            #
+            #                  allowedMethods:
+            #                    - GET
+            #                    - POST
+            #                    - PUT
+            #                    - DELETE
+            #                    - OPTIONS
+            #                  allowedHeaders:
+            #                    - "*"
+            #                  exposedHeaders:
+            #                    - "Set-Cookie"
+            #                    - "X-XSRF-TOKEN"
+            #                    - "Authorization"
+            #                  allowCredentials: true
+
+            - id: auth-service
+              uri: http://127.0.0.1:9000
+              predicates:
+                - Path=/auth/**
               filters:
-                - TokenRelay
-  security:
-    oauth2:
-      client:
-        provider:
-          platform-auth-server:
-            issuer-uri: http://127.0.0.1:9000
-        registration:
-          gateway-client:
-            provider: platform-auth-server
-            client-id: gateway-client
-            client-secret: "secret"
-            client-authentication-method: client_secret_post
-            authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8080/login/oauth2/code/gateway-client
-            scope:
-              - openid
-              - profile
-              - email
+                - RewritePath=/auth/(?<segment>.*), /${segment}
+
+#            - id: book-service
+#              uri: http://localhost:8081
+#              predicates:
+#                - Path=/books/**
+#              filters:
+#                - TokenRelay
+#  platform-auth-server:
+#    issuer-uri: http://127.0.0.1:9000
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          platform-auth-server:
+#            issuer-uri: http://127.0.0.1:9000
+#        registration:
+#          gateway-client:
+#            provider: platform-auth-server
+#            client-id: gateway-client
+#            client-secret: "secret"
+#            client-authentication-method: client_secret_post
+#            authorization-grant-type: authorization_code
+#            redirect-uri: http://localhost:8080/login/oauth2/code/gateway-client
+#            scope:
+#              - openid
+#              - profile
+#              - email
+logging:
+  level:
+    org.springframework.web.filter.CorsFilter: DEBUG
