@@ -34,7 +34,7 @@ public class BookResource {
         // Send GET request with token
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<Map> response = restTemplate.exchange(
-                "http://127.0.0.1:9000/user/current",
+                "http://127.0.0.1:9000/user/userinfo",
                 HttpMethod.GET,
                 httpEntity,
                 Map.class

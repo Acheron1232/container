@@ -1,4 +1,4 @@
-package org.acheron.authserver.user;
+package org.acheron.authserver.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +23,16 @@ public class User implements UserDetails {
     private Long id;
     private String email;
     private String username;
+    private String displayName;
+    private String bio;
+    private String image;
+    private Boolean isEmailVerified;
+    @Enumerated(EnumType.STRING)
+    private AuthMethod authMethod;
+
+
+
+
     @Enumerated(EnumType.STRING)
     private Role role;
     private String password;
@@ -50,6 +60,10 @@ public class User implements UserDetails {
         }
     }
 
+    public enum AuthMethod {
+        DEFAULT, GOOGLE, GITHUB
+
+    }
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

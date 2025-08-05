@@ -2,9 +2,8 @@ package org.acheron.authserver.config;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.acheron.authserver.user.UserService;
+import org.acheron.authserver.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -14,19 +13,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.config.web.server.OidcBackChannelServerLogoutHandler;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.server.session.InMemoryReactiveOidcSessionRegistry;
-import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -40,15 +30,12 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.oauth2.server.authorization.token.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Configuration
@@ -58,6 +45,7 @@ public class SecurityConfig {
     private final Oauth2AccessTokenCustomizer oauth2AccessTokenCustomizer;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final OAuth2LoginSuccessHandler auth2LoginSuccessHandler;
 //        private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
@@ -188,7 +176,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(formLogin -> formLogin.loginPage("/login").permitAll()) // Enable form login.html
-                .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login").permitAll())
+                .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login").permitAll().successHandler(auth2LoginSuccessHandler))
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/","/spa/logout","/login.html")
                         .permitAll().requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated());
 //            http.cors(e->e.disable());
@@ -203,11 +191,9 @@ public class SecurityConfig {
         JwtEncoder jwtEncoder = new NimbusJwtEncoder(jwkSource);
         JwtGenerator jwtAccessTokenGenerator = new JwtGenerator(jwtEncoder);
         jwtAccessTokenGenerator.setJwtCustomizer(oauth2AccessTokenCustomizer); // jwt customizer from part 1 (optional)
-
         return new DelegatingOAuth2TokenGenerator(
                 jwtAccessTokenGenerator,
                 new OAuth2PublicClientRefreshTokenGenerator() // add customized refresh token generator
         );
     }
-
 }
