@@ -53,6 +53,22 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/order-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/order-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/pizza-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/pizza-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/reactive" />
         <option name="modules">
           <set>
@@ -65,6 +81,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/resource-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/user-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/user-server" />
           </set>
         </option>
       </GradleProjectSettings>

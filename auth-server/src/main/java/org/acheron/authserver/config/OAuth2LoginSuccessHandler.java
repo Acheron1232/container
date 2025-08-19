@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.acheron.authserver.dto.UserCreateDto;
+import org.acheron.authserver.dto.UserCreateOauthDto;
 import org.acheron.authserver.entity.User;
 import org.acheron.authserver.service.UserService;
 import org.springframework.http.HttpEntity;
@@ -28,7 +30,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
@@ -75,45 +76,31 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
             return;
         }
 
-        AtomicReference<User> userRef = new AtomicReference<>();
 
-        String finalEmail = email;
-        userService.findByEmail(email).ifPresentOrElse(user -> {
-            userRef.set(user);
-        }, () -> {
+//        userService.findByEmail(email).ifPresentOrElse(user -> {
+//            if(!user.getAuthMethod().name().toLowerCase().equals(provider)){
+//
+//            }
+//        },()->{
+//
+//        });
+        if(!userService.existsByEmail(email)){
             String username = (String) attributes.get("name");
-            User newUser = new User();
-            newUser.setEmail(finalEmail);
+            UserCreateOauthDto newUser = new UserCreateOauthDto();
+            newUser.setEmail(email);
             newUser.setUsername(username);
             newUser.setDisplayName((String) attributes.getOrDefault("name", username));
             newUser.setImage((String) attributes.getOrDefault("avatar_url", attributes.getOrDefault("picture", "")));
-            newUser.setIsEmailVerified(true);
-            newUser.setRole(User.Role.USER);
-            newUser.setAuthMethod("github".equals(provider) ? User.AuthMethod.GITHUB : User.AuthMethod.GOOGLE);
-            userRef.set(userService.save(newUser));
-        });
+            newUser.setEmailVerified(true);
+            newUser.setRole("USER");
+            newUser.setAuthMethod("github".equals(provider) ? "GITHUB" : "GOOGLE");
+            userService.save(newUser);
+        }
 
-        log.info("User logged in via {}: {}", provider, userRef.get().getEmail());
+        log.info("User logged in via {}: {}", provider, email);
 
         super.onAuthenticationSuccess(request, response, authentication);
     }
-
-//    private String generateUsernameFromAttributes(Map<String, Object> attributes, String provider) {
-//        String baseUsername;
-//        if ("github".equals(provider)) {
-//            baseUsername = (String) attributes.getOrDefault("login", "user");
-//        } else {
-//            baseUsername = ((String) attributes.getOrDefault("name", "user")).replaceAll("\\s+", "").toLowerCase();
-//        }
-//
-//        String username = baseUsername;
-//        int attempt = 0;
-//        while (userService.existsByUsername(username)) {
-//            attempt++;
-//            username = baseUsername + attempt;
-//        }
-//        return username;
-//    }
 
     private String getPrimaryEmailForGitHub(Authentication authentication) throws JsonProcessingException {
         OAuth2AuthorizedClient client = authorizedClientService

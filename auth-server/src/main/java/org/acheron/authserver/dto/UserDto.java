@@ -3,13 +3,12 @@ package org.acheron.authserver.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.acheron.authserver.entity.User;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class UserDto {
-    private String username;
-    private String email;
-    private User.Role role;
+    String username;
+    String email;
+    String role;
 }

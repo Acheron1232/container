@@ -1,12 +1,15 @@
-package org.acheron.authserver.dto;
+package com.acheron.userserver.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.acheron.userserver.entity.User;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserChangeDto {
+public class UserDto {
     private String username;
+    private String email;
+    private User.Role role;
 }

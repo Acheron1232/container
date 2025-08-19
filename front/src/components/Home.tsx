@@ -1,11 +1,16 @@
 // src/pages/Home.js
 import { useAuth } from "react-oidc-context";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 export default function Home() {
     const auth = useAuth();
     const navigate = useNavigate();
-
+    // useEffect(() => {
+    //     if (!auth.isAuthenticated && !auth.isLoading) {
+    //         navigate("/login");
+    //     }
+    // }, [auth.isAuthenticated, auth.isLoading, navigate]);
     const fetchProtected = async () => {
         try {
             const res = await fetch("http://localhost:8080/books", {
@@ -28,20 +33,42 @@ export default function Home() {
             },
             credentials: "include",
         });
+        await auth.signoutRedirect({
+            post_logout_redirect_uri: "http://localhost:5173/logout",
+        });
         await auth.removeUser();
-        navigate("/login");
+        // navigate("/login");
     };
+    interface MyClaims {
+        name?: string;
+        sub?: string;
+        roles?: string[];
+        [key: string]: any; // якщо є інші поля
+    }
+    const name = () : string=>{
 
-    if (!auth.isAuthenticated) {
-        navigate("/login");
-        return null;
+        const token = auth.user?.access_token;
+
+        if (token) {
+            const claims = jwtDecode<MyClaims>(token);
+            return claims.name ?? "";
+        }
+        return "";
     }
 
     return (
         <div>
-            Hello {auth.user?.profile.sub}{" "}
-            <button onClick={handleLogout}>Log out</button>
-            <button onClick={fetchProtected}>Fetch protected resource</button>
+            {auth.isAuthenticated?(
+                <>
+                    Hello {name()}{" "}
+                    <button onClick={handleLogout}>Log out</button>
+                    <button onClick={fetchProtected}>Fetch protected resource</button>
+                </>
+                ):(
+                <>
+                    <button onClick={() => auth.signinRedirect()}>Log in</button>
+                </>
+                )}
         </div>
     );
 }

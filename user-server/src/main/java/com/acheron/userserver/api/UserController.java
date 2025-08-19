@@ -1,10 +1,11 @@
-package org.acheron.authserver.controller.api;
+package com.acheron.userserver.api;
 
+import com.acheron.userserver.dto.UserCreateDto;
+import com.acheron.userserver.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.acheron.authserver.dto.UserChangeDto;
-import org.acheron.authserver.dto.UserDto;
-import org.acheron.authserver.entity.User;
-import org.acheron.authserver.service.UserService;
+import com.acheron.userserver.dto.UserChangeDto;
+import com.acheron.userserver.dto.UserDto;
+import com.acheron.userserver.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,14 +15,20 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/user")
+//@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
+    @PostMapping("/")
+    public void save(@RequestBody UserCreateDto userDto) {
+        userService.save(userDto);
+    }
+
+
     @GetMapping("/userinfo")
     public UserDto getCurrentUser(@AuthenticationPrincipal Jwt jwt){
-        User user = userService.findByName((String) jwt.getClaims().get("username")).orElseThrow(() -> new UsernameNotFoundException((String) jwt.getClaims().get("username")));
+        User user = userService.findByName((String) jwt.getClaims().get("name")).orElseThrow(() -> new UsernameNotFoundException((String) jwt.getClaims().get("username")));
         return new UserDto(user.getUsername(),user.getEmail(),user.getRole());
     }
     @PatchMapping("/userinfo")

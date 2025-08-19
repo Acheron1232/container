@@ -1,11 +1,11 @@
-package org.acheron.authserver.service;
+package com.acheron.userserver.service;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.acheron.authserver.entity.Token;
-import org.acheron.authserver.entity.User;
-import org.acheron.authserver.repo.TokenRepository;
+import com.acheron.userserver.entity.Token;
+import com.acheron.userserver.entity.User;
+import com.acheron.userserver.repo.TokenRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

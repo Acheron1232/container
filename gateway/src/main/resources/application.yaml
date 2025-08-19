@@ -30,27 +30,15 @@ spring:
               uri: http://localhost:8081
               predicates:
                 - Path=/books/**
-            #              metadata:
-            #                cors:
-            #                  allowedOrigins:
-            #                    - "http://localhost:5173"
-            #                    - "http://localhost"
-            #                    - "http://127.0.0.1:9000"
-            #                    - "https://localhost"
-            #
-            #                  allowedMethods:
-            #                    - GET
-            #                    - POST
-            #                    - PUT
-            #                    - DELETE
-            #                    - OPTIONS
-            #                  allowedHeaders:
-            #                    - "*"
-            #                  exposedHeaders:
-            #                    - "Set-Cookie"
-            #                    - "X-XSRF-TOKEN"
-            #                    - "Authorization"
-            #                  allowCredentials: true
+              filters:
+                - RewritePath=/books/(?<segment>.*), /${segment}
+
+            - id: user-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/user/**
+              filters:
+                - RewritePath=/user/(?<segment>.*), /${segment}
 
             - id: auth-service
               uri: http://127.0.0.1:9000

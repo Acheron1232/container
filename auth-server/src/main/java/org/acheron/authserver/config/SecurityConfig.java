@@ -14,9 +14,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2Token;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -59,6 +64,78 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    @Bean
+    @Order(1) // security filter chain for the authorization server
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+
+        // applyDefaultSecurity method deprecated as of spring security 6.4.2, so we replace it with below code block
+        // -- STARTS HERE
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                OAuth2AuthorizationServerConfigurer.authorizationServer();
+
+        http
+//                .sessionManagement(s-> s.se)
+                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                .with(authorizationServerConfigurer, authorizationServer ->
+                        authorizationServer
+                                .clientAuthentication(clientAuthenticationConfigurer ->
+                                        clientAuthenticationConfigurer
+                                                .authenticationConverter(new PublicClientRefreshTokenAuthenticationConverter())
+                                                .authenticationProvider(
+                                                        new PublicClientRefreshTokenAuthenticationProvider(
+                                                                registeredClientRepository(),
+                                                                new InMemoryOAuth2AuthorizationService() // replace with your AuthorizationService implementation if you have one
+                                                        )
+                                                )
+                                )
+                                .oidc(Customizer.withDefaults()) // enable openid connect
+                )
+                .authorizeHttpRequests((authorize) -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/spa/logout","/login","/registration","/.well-known/appspecific/**"
+                        , "/favicon.ico"
+                ).permitAll().anyRequest().authenticated());
+        // -- ENDS HERE
+        http.oidcLogout((logout) -> logout
+                .backChannel(Customizer.withDefaults())
+        );
+
+        http
+                .exceptionHandling((exceptions) -> // If any errors occur redirect user to login.html page
+                        exceptions.defaultAuthenticationEntryPointFor(
+                                new LoginUrlAuthenticationEntryPoint("/login"),
+                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                        )
+                )
+                // enable auth server to accept JWT for endpoints such as /userinfo
+                .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
+        http.userDetailsService(userService);
+        http.cors(Customizer.withDefaults());
+
+//            http.cors(e->e.disable());
+        return http.build();
+    }
+
+    @Bean
+    @Order(2) // security filter chain for the rest of your application and any custom endpoints you may have
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll()) // Enable form login.html
+                .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login").permitAll()
+                        .successHandler(auth2LoginSuccessHandler)
+                )
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/","/spa/logout","/login","/registration","/.well-known/appspecific/**"
+                                , "/favicon.ico"
+                        )
+                        .permitAll().requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated());
+//            http.cors(e->e.disable());
+        http.cors(Customizer.withDefaults());
+//        http.requestCache(c -> c.requestCache(new CustomRequestCache()));
+
+//
+        return http.build();
     }
 
     @Bean
@@ -110,79 +187,26 @@ public class SecurityConfig {
                 .scope(OidcScopes.EMAIL)
                 .tokenSettings(
                         TokenSettings.builder()
-                                .accessTokenTimeToLive(Duration.ofSeconds(200))
+                                .accessTokenTimeToLive(Duration.ofMinutes(30))
+                                .refreshTokenTimeToLive(Duration.ofDays(60))
                                 .reuseRefreshTokens(false)
                                 .build()
                 )
                 .clientSettings(ClientSettings.builder().requireProofKey(true).build()) // enable PKCE
                 .build();
 
-        return new InMemoryRegisteredClientRepository(webClient, webClient2, publicWebClient);
-    }
-
-    @Bean
-    @Order(1) // security filter chain for the authorization server
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-
-        // applyDefaultSecurity method deprecated as of spring security 6.4.2, so we replace it with below code block
-        // -- STARTS HERE
-        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
-                OAuth2AuthorizationServerConfigurer.authorizationServer();
-
-        http
-//                .sessionManagement(s-> s.se)
-                .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-                .with(authorizationServerConfigurer, authorizationServer ->
-                        authorizationServer
-                                .clientAuthentication(clientAuthenticationConfigurer ->
-                                        clientAuthenticationConfigurer
-                                                .authenticationConverter(new PublicClientRefreshTokenAuthenticationConverter())
-                                                .authenticationProvider(
-                                                        new PublicClientRefreshTokenAuthenticationProvider(
-                                                                registeredClientRepository(),
-                                                                new InMemoryOAuth2AuthorizationService() // replace with your AuthorizationService implementation if you have one
-                                                        )
-                                                )
-                                )
-                                .oidc(Customizer.withDefaults()) // enable openid connect
-                )
-                .authorizeHttpRequests((authorize) -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/spa/logout","/login.html").permitAll().anyRequest().authenticated());
-        // -- ENDS HERE
-        http.oidcLogout((logout) -> logout
-                .backChannel(Customizer.withDefaults())
-        );
-
-        http
-                .exceptionHandling((exceptions) -> // If any errors occur redirect user to login.html page
-                        exceptions.defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint("/login"),
-                                new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-                        )
-                )
-                // enable auth server to accept JWT for endpoints such as /userinfo
-                .oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
-
-        http.userDetailsService(userService);
-        http.cors(Customizer.withDefaults());
-
-//            http.cors(e->e.disable());
-        return http.build();
-    }
-
-    @Bean
-    @Order(2) // security filter chain for the rest of your application and any custom endpoints you may have
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll()) // Enable form login.html
-                .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login").permitAll().successHandler(auth2LoginSuccessHandler))
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/","/spa/logout","/login.html")
-                        .permitAll().requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated());
-//            http.cors(e->e.disable());
-        http.cors(Customizer.withDefaults());
-//
-        return http.build();
+        RegisteredClient internalServiceClient = RegisteredClient
+                .withId(UUID.randomUUID().toString())
+                .clientId("auth-server-service")
+                .clientSecret(passwordEncoder.encode("super-secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .scope("ADMIN")
+                .tokenSettings(TokenSettings.builder()
+                        .accessTokenTimeToLive(Duration.ofMinutes(10))
+                        .build())
+                .build();
+        return new InMemoryRegisteredClientRepository(webClient, webClient2, publicWebClient,internalServiceClient);
     }
 
 
