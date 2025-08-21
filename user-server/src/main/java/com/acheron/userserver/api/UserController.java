@@ -29,7 +29,7 @@ public class UserController {
     @GetMapping("/userinfo")
     public UserDto getCurrentUser(@AuthenticationPrincipal Jwt jwt){
         User user = userService.findByName((String) jwt.getClaims().get("name")).orElseThrow(() -> new UsernameNotFoundException((String) jwt.getClaims().get("username")));
-        return new UserDto(user.getUsername(),user.getEmail(),user.getRole());
+        return new UserDto(user.getId(),user.getUsername(),user.getEmail(),user.getRole());
     }
     @PatchMapping("/userinfo")
     public UserChangeDto userChange(Principal principal){

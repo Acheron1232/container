@@ -5,16 +5,17 @@ CREATE TABLE orders
 (
     id         UUID PRIMARY KEY   DEFAULT gen_random_uuid(),
     user_id    BIGINT    NOT NULL,
-    order_time TIMESTAMP NOT NULL DEFAULT NOW()
+    order_time TIMESTAMP NOT NULL DEFAULT NOW(),
+    status TEXT NOT NULL
 );
 --changeset artem:2
 CREATE TABLE pizza
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name        VARCHAR(255) NOT NULL,
+    name        VARCHAR(255) NOT NULL UNIQUE ,
     description TEXT,
     images      text[],
-    price       int          NOT NULL
+    price       float          NOT NULL
 );
 --changeset artem:3
 CREATE TABLE delivery

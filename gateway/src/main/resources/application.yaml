@@ -8,6 +8,7 @@ spring:
               '[/**]':
                 allowedOrigins:
                   - "http://localhost:5173"
+                  - "http://localhost:3000"
                 allowedOriginPatterns:
                   - "*"
                 allowedMethods:
@@ -46,6 +47,13 @@ spring:
                 - Path=/auth/**
               filters:
                 - RewritePath=/auth/(?<segment>.*), /${segment}
+
+            - id: pizza-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/pizza/**
+              filters:
+                - RewritePath=/pizza/(?<segment>.*), /${segment}
 
 #            - id: book-service
 #              uri: http://localhost:8081

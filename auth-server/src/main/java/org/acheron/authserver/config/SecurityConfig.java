@@ -51,7 +51,6 @@ public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final OAuth2LoginSuccessHandler auth2LoginSuccessHandler;
-//        private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
@@ -59,6 +58,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
@@ -194,6 +194,26 @@ public class SecurityConfig {
                 )
                 .clientSettings(ClientSettings.builder().requireProofKey(true).build()) // enable PKCE
                 .build();
+        RegisteredClient pizzaService = RegisteredClient
+                .withId(UUID.randomUUID().toString())
+                .clientId("pizza-service")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.NONE) // authentication method set to 'NONE'
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("http://localhost:3000/callback")
+                .postLogoutRedirectUri("http://localhost:3000/logout")
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.PROFILE)
+                .scope(OidcScopes.EMAIL)
+                .tokenSettings(
+                        TokenSettings.builder()
+                                .accessTokenTimeToLive(Duration.ofMinutes(30))
+                                .refreshTokenTimeToLive(Duration.ofDays(60))
+                                .reuseRefreshTokens(false)
+                                .build()
+                )
+                .clientSettings(ClientSettings.builder().requireProofKey(true).build()) // enable PKCE
+                .build();
 
         RegisteredClient internalServiceClient = RegisteredClient
                 .withId(UUID.randomUUID().toString())
@@ -206,7 +226,7 @@ public class SecurityConfig {
                         .accessTokenTimeToLive(Duration.ofMinutes(10))
                         .build())
                 .build();
-        return new InMemoryRegisteredClientRepository(webClient, webClient2, publicWebClient,internalServiceClient);
+        return new InMemoryRegisteredClientRepository(pizzaService,webClient, webClient2, publicWebClient,internalServiceClient);
     }
 
 

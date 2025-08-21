@@ -16,20 +16,8 @@
     @EnableWebSecurity
     public class ResourceServerConfig {
 
-//        @Bean
-//        CorsConfigurationSource corsConfigurationSource() {
-//            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//            CorsConfiguration config = new CorsConfiguration();
-//            config.addAllowedOrigin("http://localhost:5173");
-//            config.addAllowedHeader("*");
-//            config.addAllowedMethod("*");
-//            config.setAllowCredentials(true);
-//            source.registerCorsConfiguration("/**", config);
-//            return source;
-//        }
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//            http.cors(Customizer.withDefaults());
             http.cors(e->e.disable());
             http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/books").authenticated());
             http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

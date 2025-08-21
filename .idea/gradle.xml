@@ -21,10 +21,10 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/client-server" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/delivery-server" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/client-server" />
+            <option value="$PROJECT_DIR$/delivery-server" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -37,42 +37,10 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/kafka-1" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/kafka-1" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/kafka-2" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/kafka-2" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/order-server" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/order-server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/pizza-server" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/pizza-server" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/reactive" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/reactive" />
           </set>
         </option>
       </GradleProjectSettings>

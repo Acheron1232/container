@@ -1,5 +1,6 @@
 package com.acheron.pizzaserver.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -14,7 +15,7 @@ import java.util.UUID
 data class OrderPizza(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
+    val id: UUID? = null,
 
     @ManyToOne
     @JoinColumn(name = "order_id")

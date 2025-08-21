@@ -18,6 +18,7 @@ out/
 auth-server/src/main/resources/application.yaml
 auth-server/src/main/resources/application-dev.yaml
 auth-server/src/main/resources/application-prod.yaml
+pizza-server/src/main/resources/container-61d6e-firebase-adminsdk-fbsvc-304c7c9f8d.json
 ### Eclipse ###
 .apt_generated
 .classpath
