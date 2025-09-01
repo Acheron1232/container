@@ -12,6 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -22,10 +25,14 @@ public class UserService implements UserDetailsService {
 
     private final RestClient restClient;
     private final UserRepository userRepository;
+    private final UserGrpcClient userGrpcClient;
+    private final OAuth2AuthorizedClientManager manager;
 
-    public UserService(@Qualifier("rest-client-with-auth") RestClient restClient, UserRepository userRepository) {
+    public UserService(@Qualifier("rest-client-with-auth") RestClient restClient, UserRepository userRepository, UserGrpcClient userGrpcClient, OAuth2AuthorizedClientManager manager) {
         this.restClient = restClient;
         this.userRepository = userRepository;
+        this.userGrpcClient = userGrpcClient;
+        this.manager = manager;
     }
 
 
@@ -34,8 +41,14 @@ public class UserService implements UserDetailsService {
                 .body(user).retrieve().toBodilessEntity();
     }
     public void save(UserCreateDto user) {
-        restClient.post().uri("/").contentType(MediaType.APPLICATION_JSON)
-                .body(user).retrieve().toBodilessEntity();
+//        restClient.post().uri("/").contentType(MediaType.APPLICATION_JSON)
+//                .body(user).retrieve().toBodilessEntity();
+        OAuth2AuthorizeRequest request1 = OAuth2AuthorizeRequest
+                .withClientRegistrationId("auth-server-service")
+                .principal("auth-server")
+                .build();
+        OAuth2AuthorizedClient authorize = manager.authorize(request1);
+        userGrpcClient.saveUser(user,authorize.getAccessToken().getTokenValue());
     }
 
     public boolean existsByEmail(String email) {
@@ -48,9 +61,7 @@ public class UserService implements UserDetailsService {
         return new UserDto(byUsername.getUsername(), byUsername.getEmail(), byUsername.getRole().toString());
     }
     public Optional<User> findByEmail(String email) {
-        Optional<User> byEmail = userRepository.findByEmail(email);
-
-        return byEmail;
+        return userRepository.findByEmail(email);
     }
 
 

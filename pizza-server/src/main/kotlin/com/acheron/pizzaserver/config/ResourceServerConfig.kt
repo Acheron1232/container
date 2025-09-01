@@ -17,7 +17,7 @@ class ResourceServerConfig {
     @Throws(Exception::class)
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? {
         http.cors {it.disable()}
-        http.authorizeHttpRequests {request -> request.anyRequest().authenticated()}
+        http.authorizeHttpRequests {request -> request.requestMatchers("/actuator/prometheus").permitAll().anyRequest().authenticated()}
         http.oauth2ResourceServer { it.jwt(Customizer.withDefaults()) }
         return http.build()
     }

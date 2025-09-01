@@ -93,7 +93,7 @@ public class SecurityConfig {
                                 .oidc(Customizer.withDefaults()) // enable openid connect
                 )
                 .authorizeHttpRequests((authorize) -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/spa/logout","/login","/registration","/.well-known/appspecific/**"
-                        , "/favicon.ico"
+                        , "/favicon.ico","/actuator/prometheus"
                 ).permitAll().anyRequest().authenticated());
         // -- ENDS HERE
         http.oidcLogout((logout) -> logout
@@ -126,7 +126,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2Login -> oauth2Login.loginPage("/login").permitAll()
                         .successHandler(auth2LoginSuccessHandler)
                 )
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/","/spa/logout","/login","/registration","/.well-known/appspecific/**"
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/","/spa/logout","/login","/registration","/.well-known/appspecific/**","/actuator/prometheus"
                                 , "/favicon.ico"
                         )
                         .permitAll().requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().anyRequest().authenticated());
