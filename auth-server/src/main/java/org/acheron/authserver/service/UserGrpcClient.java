@@ -18,7 +18,7 @@ public class UserGrpcClient {
 
      public void saveUser(UserCreateDto user, String accessToken) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("localhost", 9090)
+                .forAddress("localhost", 9091)
                 .usePlaintext()
                 .build();
 

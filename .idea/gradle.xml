@@ -37,6 +37,14 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/order-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/order-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/pizza-server" />
         <option name="modules">
           <set>

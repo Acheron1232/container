@@ -1,0 +1,16 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    show-sql: true
+server:
+  port: 8084
