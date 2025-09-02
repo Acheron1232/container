@@ -3,7 +3,11 @@ package com.acheron.orderserver.service;
 import com.acheron.orderserver.entity.Order;
 import com.acheron.orderserver.entity.OrderItem;
 import com.acheron.orderserver.entity.Payment;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -12,20 +16,23 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@EnableScheduling
 public class FakeOrderGenerator {
 
-    private final KafkaTemplate<String, Order> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public FakeOrderGenerator(KafkaTemplate<String, Order> kafkaTemplate) {
+    public FakeOrderGenerator(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
     private final Random random = new Random();
 
     @Scheduled(fixedRate = 5000) // кожні 5 секунд
-    public void produce() {
+    public void produce() throws JsonProcessingException {
         Order order = generateFakeOrder();
-        kafkaTemplate.send("orders", order.getId().toString(), order);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        kafkaTemplate.send("orders", order.getId().toString(), objectMapper.writeValueAsString(order));
         System.out.println("Sent fake order: " + order.getId());
     }
 
@@ -74,7 +81,7 @@ public class FakeOrderGenerator {
     }
 
     private String randomStatus() {
-        String[] statuses = {"NEW", "IN_PROGRESS", "COMPLETED", "CANCELLED"};
+        String[] statuses = {"NEW"};
         return statuses[random.nextInt(statuses.length)];
     }
 
