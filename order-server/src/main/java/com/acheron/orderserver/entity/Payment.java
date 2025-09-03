@@ -1,5 +1,6 @@
 package com.acheron.orderserver.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class Payment {
 
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
 

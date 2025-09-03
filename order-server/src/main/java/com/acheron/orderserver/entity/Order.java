@@ -40,12 +40,10 @@ public class Order {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<OrderItem> items;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private Payment payment;
 }

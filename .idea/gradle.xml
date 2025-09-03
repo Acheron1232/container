@@ -5,7 +5,6 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -14,6 +13,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/auth-server" />
+        <option name="gradleJvm" value="graalvm-ce-21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/auth-server" />
@@ -33,6 +33,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/gateway" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/kitchen-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/kitchen-server" />
           </set>
         </option>
       </GradleProjectSettings>

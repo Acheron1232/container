@@ -36,6 +36,18 @@ services:
     volumes:
       - order_postgres:/var/lib/postgresql/data
 
+  kitchen-postgres-db:
+    image: postgres:17-alpine
+    container_name: kitchen-postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - kitchen_postgres:/var/lib/postgresql/data
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -77,3 +89,4 @@ volumes:
   pizza_postgres:
   user_postgres:
   order_postgres:
+  kitchen_postgres:

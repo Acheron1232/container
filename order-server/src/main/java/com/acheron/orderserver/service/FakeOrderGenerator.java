@@ -25,9 +25,10 @@ public class FakeOrderGenerator {
     public FakeOrderGenerator(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
         this.uuids = new ArrayList<>();
-        uuids.add(UUID.randomUUID().toString());
-        uuids.add(UUID.randomUUID().toString());
-        uuids.add(UUID.randomUUID().toString());
+        uuids.add("98e51bca-ddbc-4348-a603-0a8cc75c8f04");
+        uuids.add("5fb8b6dc-42a5-4ebd-8ff6-49a5b7ded99b");
+        uuids.add("30a38e93-3254-40cb-84a1-8da02c5127db");
+        uuids.add("54f6c9d3-81c9-4a1b-9d6a-7c1f1e94b6b7");
     }
 
     private final Random random = new Random();
@@ -44,7 +45,7 @@ public class FakeOrderGenerator {
     private Order generateFakeOrder() {
         UUID orderId = UUID.randomUUID();
         long userId = random.nextInt(1000) + 1;
-        UUID facilityId = UUID.fromString(uuids.stream().findAny().get());
+        UUID facilityId = UUID.fromString(uuids.get(random.nextInt(uuids.size())));
         String status = randomStatus();
         long totalPrice = random.nextInt(5000) + 100; // від 100 до 5100
         LocalDateTime createdAt = LocalDateTime.now();
