@@ -10,8 +10,23 @@ CREATE TABLE pizza
     price       FLOAT        NOT NULL
 );
 
-
 --changeset artem:2
+CREATE TABLE ingredient
+(
+    id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL UNIQUE
+
+)
+
+--changeset artem:3
+CREATE TABLE pizza_ingredient
+(
+    pizza_id      UUID NOT NULL REFERENCES pizza (id) ON DELETE CASCADE,
+    ingredient_id UUID NOT NULL REFERENCES ingredient (id) ON DELETE CASCADE,
+    PRIMARY KEY (pizza_id, ingredient_id)
+);
+
+--changeset artem:4
 CREATE TABLE facility
 (
     id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),

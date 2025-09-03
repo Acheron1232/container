@@ -20,9 +20,14 @@ import java.util.*;
 public class FakeOrderGenerator {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final List<String> uuids;
 
     public FakeOrderGenerator(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
+        this.uuids = new ArrayList<>();
+        uuids.add(UUID.randomUUID().toString());
+        uuids.add(UUID.randomUUID().toString());
+        uuids.add(UUID.randomUUID().toString());
     }
 
     private final Random random = new Random();
@@ -39,7 +44,7 @@ public class FakeOrderGenerator {
     private Order generateFakeOrder() {
         UUID orderId = UUID.randomUUID();
         long userId = random.nextInt(1000) + 1;
-        UUID facilityId = UUID.randomUUID();
+        UUID facilityId = UUID.fromString(uuids.stream().findAny().get());
         String status = randomStatus();
         long totalPrice = random.nextInt(5000) + 100; // від 100 до 5100
         LocalDateTime createdAt = LocalDateTime.now();

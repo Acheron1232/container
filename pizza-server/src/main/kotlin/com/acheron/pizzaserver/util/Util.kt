@@ -23,7 +23,6 @@ class Util(
         val authentication = SecurityContextHolder.getContext().authentication
         assert(authentication is JwtAuthenticationToken)
         val jwtAuthenticationToken = authentication as JwtAuthenticationToken
-        val username: String = authentication.name
         val jwtString = jwtAuthenticationToken.token.tokenValue
         val restClient = RestClient.builder().build()
         val user: Map<String, String>? =
