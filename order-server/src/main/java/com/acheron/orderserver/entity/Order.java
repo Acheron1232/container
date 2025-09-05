@@ -1,11 +1,9 @@
 package com.acheron.orderserver.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,18 +24,28 @@ public class Order {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "facility_id", nullable = false)
+    @Column(name = "facility_id")
     private UUID facilityId;
 
+    @Column(name = "table_id")
+    private UUID tableId;
+
     @Column(nullable = false)
-    private String status;
+    private STATUS status;
 
     @Column(name = "total_price", nullable = false)
-    private Long totalPrice;
+    private Float totalPrice;
+
+    @Column(name = "type", nullable = false)
+    private TYPE type;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "placed_at", nullable = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime placedAt = LocalDateTime.now();
+
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
@@ -46,4 +54,13 @@ public class Order {
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Payment payment;
+
+    enum STATUS {
+        INIT,
+        PAYED,
+    }
+    enum TYPE {
+        ORDER,
+        RESTAURANT
+    }
 }

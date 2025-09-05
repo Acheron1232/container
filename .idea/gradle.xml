@@ -61,10 +61,10 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/resource-server" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/table-server" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$/resource-server" />
+            <option value="$PROJECT_DIR$/table-server" />
           </set>
         </option>
       </GradleProjectSettings>

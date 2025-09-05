@@ -25,12 +25,7 @@ class FacilityApi(
         @RequestParam(defaultValue = "name", name = "sort_by") sortBy: String,
         @RequestParam(defaultValue = "asc", name = "sort_dir") sortDir: String
     ): List<Facility> {
-        val sort = if (sortDir.equals("desc", ignoreCase = true)) {
-            Sort.by(sortBy).descending()
-        } else {
-            Sort.by(sortBy).ascending()
-        }
-        val pageable = PageRequest.of(page, size, sort)
+        val pageable = UtilApiComponent.pageable(page, size, sortBy, sortDir)
         val pizzaPage = facilityService.findAll(pageable)
         return pizzaPage.content
     }

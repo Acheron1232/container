@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
+@RequestMapping("/pizza")
 class PizzaApi(
     private val pizzaService: PizzaService
 ) {
@@ -25,12 +26,7 @@ class PizzaApi(
         @RequestParam(defaultValue = "name", name = "sort_by") sortBy: String,
         @RequestParam(defaultValue = "asc", name = "sort_dir") sortDir: String
     ): List<Pizza> {
-        val sort = if (sortDir.equals("desc", ignoreCase = true)) {
-            Sort.by(sortBy).descending()
-        } else {
-            Sort.by(sortBy).ascending()
-        }
-        val pageable = PageRequest.of(page, size, sort)
+        val pageable = UtilApiComponent.pageable(page, size, sortBy, sortDir)
         val pizzaPage = pizzaService.findAll(pageable)
         return pizzaPage.content
     }

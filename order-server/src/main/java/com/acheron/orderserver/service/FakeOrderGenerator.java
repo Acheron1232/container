@@ -21,6 +21,7 @@ public class FakeOrderGenerator {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final List<String> uuids;
+    private final List<String> uuidsTable;
 
     public FakeOrderGenerator(KafkaTemplate<String, String> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
@@ -29,6 +30,11 @@ public class FakeOrderGenerator {
         uuids.add("5fb8b6dc-42a5-4ebd-8ff6-49a5b7ded99b");
         uuids.add("30a38e93-3254-40cb-84a1-8da02c5127db");
         uuids.add("54f6c9d3-81c9-4a1b-9d6a-7c1f1e94b6b7");
+        this.uuidsTable = new ArrayList<>();
+        this.uuidsTable.add("a2d802f2-121b-4b3a-a54a-367e869a8c0b");
+        this.uuidsTable.add("3fed4bbb-b1c0-4f67-87a4-89a9f42cdcaf");
+        this.uuidsTable.add("4dfd12b6-6a7b-4b94-bd0a-6d6bfec37f32");
+        this.uuidsTable.add("c2983f69-d9c7-4386-9473-42bc0090094f");
     }
 
     private final Random random = new Random();
@@ -46,6 +52,7 @@ public class FakeOrderGenerator {
         UUID orderId = UUID.randomUUID();
         long userId = random.nextInt(1000) + 1;
         UUID facilityId = UUID.fromString(uuids.get(random.nextInt(uuids.size())));
+        UUID tableId = UUID.fromString(uuids.get(random.nextInt(uuids.size())));
         String status = randomStatus();
         long totalPrice = random.nextInt(5000) + 100; // від 100 до 5100
         LocalDateTime createdAt = LocalDateTime.now();
@@ -57,7 +64,6 @@ public class FakeOrderGenerator {
                     .id(UUID.randomUUID())
                     .pizzaId(UUID.randomUUID())
                     .quantity(random.nextInt(3) + 1)
-                    .price(BigDecimal.valueOf(random.nextInt(500) + 50))
                     .build();
             items.add(item);
         }
@@ -72,8 +78,8 @@ public class FakeOrderGenerator {
                 .id(orderId)
                 .userId(userId)
                 .facilityId(facilityId)
+                .tableId(tableId)
                 .status(status)
-                .totalPrice(totalPrice)
                 .createdAt(createdAt)
                 .items(items)
                 .payment(payment)

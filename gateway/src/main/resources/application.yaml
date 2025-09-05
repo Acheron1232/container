@@ -51,15 +51,27 @@ spring:
             - id: pizza-service
               uri: http://localhost:8083
               predicates:
-                - Path=/pizza/**
+                - Path=/pizzeria/**
               filters:
-                - RewritePath=/pizza/(?<segment>.*), /${segment}
+                - RewritePath=/pizzeria/(?<segment>.*), /${segment}
             - id: order-service
               uri: http://localhost:8084
               predicates:
                 - Path=/order/**
               filters:
                 - RewritePath=/order/(?<segment>.*), /${segment}
+            - id: table-service
+              uri: http://localhost:8085
+              predicates:
+                - Path=/table/**
+              filters:
+                - RewritePath=/table/(?<segment>.*), /${segment}
+            - id: kitchen-service
+              uri: http://localhost:8086
+              predicates:
+                - Path=/kitchen/**
+              filters:
+                - RewritePath=/kitchen/(?<segment>.*), /${segment}
 #            - id: book-service
 #              uri: http://localhost:8081
 #              predicates:
