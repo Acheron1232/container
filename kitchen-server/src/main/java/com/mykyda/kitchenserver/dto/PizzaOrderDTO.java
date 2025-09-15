@@ -1,11 +1,11 @@
 package com.mykyda.kitchenserver.dto;
 
 import com.mykyda.kitchenserver.database.entity.PizzaOrder;
+import com.mykyda.kitchenserver.database.enums.PizzaStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.util.UUID;
 
 @Getter
@@ -17,19 +17,19 @@ public class PizzaOrderDTO {
 
     private UUID pizzaTemplateId;
 
-    private UUID orderId;
+    private Integer quantityOrdered;
 
-    private String status;
+    private Integer quantityReady;
 
-    private Timestamp createdAt;
+    private PizzaStatus status;
 
     public static PizzaOrderDTO of(PizzaOrder pizzaOrder) {
         return PizzaOrderDTO.builder()
                 .id(pizzaOrder.getId())
                 .pizzaTemplateId(pizzaOrder.getPizzaTemplateId())
-                .orderId(pizzaOrder.getOrderId())
-                .status(pizzaOrder.getStatus().name())
-                .createdAt(pizzaOrder.getCreatedAt())
+                .quantityOrdered(pizzaOrder.getQuantityOrdered())
+                .quantityReady(pizzaOrder.getQuantityReady())
+                .status(pizzaOrder.getStatus())
                 .build();
     }
 }

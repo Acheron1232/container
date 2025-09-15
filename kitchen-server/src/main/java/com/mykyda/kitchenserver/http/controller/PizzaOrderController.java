@@ -1,23 +1,26 @@
 package com.mykyda.kitchenserver.http.controller;
 
-import com.mykyda.kitchenserver.dto.PizzaOrderDTO;
-import com.mykyda.kitchenserver.service.PizzaOrderService;
+import com.mykyda.kitchenserver.service.KitchenService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/kitchen")
 public class PizzaOrderController {
 
-    private final PizzaOrderService pizzaOrderService;
+    private final KitchenService kitchenService;
 
-    @GetMapping("/get-ordered-pizza")
-    private List<PizzaOrderDTO> getOrderedPizza() {
-        return pizzaOrderService.getOrderedPizzas();
+    @PatchMapping("/change-ready-quantity")
+    public ResponseEntity<Object> changeReadyQuantity(@RequestBody Map<UUID, Integer> pizzaOrdersReady) {
+        kitchenService.setReadyQuantities(pizzaOrdersReady);
+        return ResponseEntity.noContent().build();
     }
 }

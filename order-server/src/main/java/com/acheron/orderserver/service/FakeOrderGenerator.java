@@ -11,9 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @EnableScheduling
@@ -53,6 +55,7 @@ public class FakeOrderGenerator {
         long userId = random.nextInt(1000) + 1;
         UUID facilityId = UUID.fromString(uuids.get(random.nextInt(uuids.size())));
         UUID tableId = UUID.fromString(uuids.get(random.nextInt(uuids.size())));
+        String type = randomType();
         String status = randomStatus();
         long totalPrice = random.nextInt(5000) + 100; // від 100 до 5100
         LocalDateTime createdAt = LocalDateTime.now();
@@ -79,10 +82,11 @@ public class FakeOrderGenerator {
                 .userId(userId)
                 .facilityId(facilityId)
                 .tableId(tableId)
-                .status(status)
+                .status(Order.STATUS.valueOf(status))
                 .createdAt(createdAt)
                 .items(items)
                 .payment(payment)
+                .type(Order.TYPE.valueOf(type))
                 .build();
 
         // зв'язати об’єкти двосторонньо
@@ -93,7 +97,12 @@ public class FakeOrderGenerator {
     }
 
     private String randomStatus() {
-        String[] statuses = {"NEW"};
+        String[] statuses = {"INIT","PAYED"};
+        return statuses[random.nextInt(statuses.length)];
+    }
+
+    private String randomType() {
+        String[] statuses = {"RESTAURANT","ORDER"};
         return statuses[random.nextInt(statuses.length)];
     }
 

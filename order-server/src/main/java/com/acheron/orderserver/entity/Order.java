@@ -55,11 +55,11 @@ public class Order {
     @ToString.Exclude
     private Payment payment;
 
-    enum STATUS {
+    public enum STATUS {
         INIT,
         PAYED,
     }
-    enum TYPE {
+    public enum TYPE {
         ORDER,
         RESTAURANT
     }

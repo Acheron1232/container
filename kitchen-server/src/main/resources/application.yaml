@@ -15,11 +15,11 @@ spring:
     url: jdbc:postgresql://localhost:5436/postgres
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 #  config:
 #    import: file:kitchen-server/.env[.properties]
 server:
-  port: 8086
+  port: 8085
 
 #facility:
 #  id: ${KITCHEN_FACILITY_ID}
