@@ -32,6 +32,12 @@ public class KitchenExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(EntityConflictException.class)
+    public ResponseEntity<String> handleEntityConflictException(EntityConflictException e) {
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody

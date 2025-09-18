@@ -9,6 +9,7 @@ import com.mykyda.kitchenserver.dto.OrderDTO;
 import com.mykyda.kitchenserver.dto.PizzaOrderDTO;
 import com.mykyda.kitchenserver.dto.ReceivedOrderDTO;
 import com.mykyda.kitchenserver.exception.DatabaseException;
+import com.mykyda.kitchenserver.exception.EntityConflictException;
 import com.mykyda.kitchenserver.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,10 @@ public class OrderService {
     @Transactional
     public OrderDTO createOrder(ReceivedOrderDTO order) {
         try {
+            var orderCheck = orderRepository.findById(order.getId());
+            if (orderCheck.isPresent()) {
+                throw new EntityConflictException("Order already exists");
+            }
             var orderToSave = Order.builder()
                     .id(order.getId())
                     .facilityId(order.getFacilityId())
