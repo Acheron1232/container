@@ -1,15 +1,14 @@
 package com.mykyda.deliveryserver.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mykyda.deliveryserver.database.entity.DeliveryOrder;
 import com.mykyda.deliveryserver.database.enums.OrderStatus;
 import com.mykyda.deliveryserver.database.enums.Type;
 import com.mykyda.deliveryserver.database.repository.DeliveryOrderRepository;
-import com.mykyda.deliveryserver.database.entity.DeliveryOrder;
 import com.mykyda.deliveryserver.dto.DeliveryOrderDTO;
+import com.mykyda.deliveryserver.dto.ParsedDeliveryOrderDTO;
 import com.mykyda.deliveryserver.exception.DatabaseException;
-import com.mykyda.deliveryserver.exception.DeliveryOrderParserException;
 import com.mykyda.deliveryserver.exception.EntityConflictException;
+import com.mykyda.deliveryserver.util.PizzaOrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 
 
 @Service
@@ -26,8 +26,7 @@ public class DeliveryOrderService {
 
     private final DeliveryOrderRepository deliveryOrderRepository;
 
-    public DeliveryOrder createOrder(DeliveryOrderDTO deliveryOrderDTO) {
-        var objectMapper =  new ObjectMapper();
+    public DeliveryOrder createOrder(ParsedDeliveryOrderDTO deliveryOrderDTO) {
         try {
             var order = deliveryOrderRepository.findById(deliveryOrderDTO.getId());
             if (order.isEmpty()) {
@@ -37,7 +36,7 @@ public class DeliveryOrderService {
                         .status(OrderStatus.valueOf(deliveryOrderDTO.getStatus()))
                         .createdAt(Timestamp.from(Instant.ofEpochMilli(deliveryOrderDTO.getCreatedAt())))
                         .type(Type.valueOf(deliveryOrderDTO.getType()))
-                        .pizzaOrders(objectMapper.writeValueAsString(deliveryOrderDTO.getPizzaOrders()))
+                        .pizzaOrders(PizzaOrderMapper.toJson(deliveryOrderDTO.getPizzaOrders()))
                         .build();
                 var savedOrder = deliveryOrderRepository.save(orderToSave);
                 log.info("saved order: {}", savedOrder.getId());
@@ -48,8 +47,16 @@ public class DeliveryOrderService {
             }
         } catch (DataAccessException e) {
             throw new DatabaseException(e.getMessage());
-        } catch (JsonProcessingException e) {
-            throw new DeliveryOrderParserException(e.getMessage());
+        }
+    }
+
+    public List<DeliveryOrderDTO> getDeliveryOrders() {
+        try {
+            var deliveryOrders = deliveryOrderRepository.findAll().stream().map(DeliveryOrderDTO::of).toList();
+            log.info("got delivery orders with ids: {}", deliveryOrders.stream().map(DeliveryOrderDTO::getId).toList());
+            return deliveryOrders;
+        } catch (DataAccessException e) {
+            throw new DatabaseException(e.getMessage());
         }
     }
 }

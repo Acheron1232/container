@@ -28,8 +28,9 @@ public class DeliveryExceptionHandler {
     }
 
     @ExceptionHandler(DeliveryOrderParserException.class)
-    public void handleDeliveryOrderParserException(DeliveryOrderParserException e) {
+    public ResponseEntity<String> handleDeliveryOrderParserException(DeliveryOrderParserException e) {
         log.warn(e.getMessage());
+        return new  ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

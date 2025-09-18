@@ -1,33 +1,45 @@
 package com.mykyda.deliveryserver.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.mykyda.deliveryserver.database.entity.DeliveryOrder;
+import com.mykyda.deliveryserver.database.enums.OrderStatus;
+import com.mykyda.deliveryserver.database.enums.Type;
+import com.mykyda.deliveryserver.util.PizzaOrderMapper;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
-@Data
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
+@ToString
+@Getter
 public class DeliveryOrderDTO {
 
     private UUID id;
 
     private UUID facilityId;
 
-    private String status;
+    private OrderStatus status;
 
-    private Long createdAt;
+    private Timestamp createdAt;
 
-    private String type;
+    private  Timestamp acquiredAt;
+
+    private Type type;
 
     private List<PizzaOrderDTO> pizzaOrders;
 
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class PizzaOrderDTO {
-        private UUID pizzaTemplateId;
-        @JsonProperty("quantityReady")
-        private Integer quantity;
+    public static DeliveryOrderDTO of(DeliveryOrder deliveryOrder) {
+        return DeliveryOrderDTO.builder()
+                .id(deliveryOrder.getId())
+                .facilityId(deliveryOrder.getFacilityId())
+                .status(deliveryOrder.getStatus())
+                .createdAt(deliveryOrder.getCreatedAt())
+                .acquiredAt(deliveryOrder.getAcquiredAt())
+                .type(deliveryOrder.getType())
+                .pizzaOrders(PizzaOrderMapper.fromJson(deliveryOrder.getPizzaOrders()))
+                .build();
     }
 }

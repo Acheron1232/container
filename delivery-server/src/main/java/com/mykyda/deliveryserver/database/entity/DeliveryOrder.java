@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -29,6 +30,10 @@ public class DeliveryOrder {
 
     @Column(nullable = false)
     private Timestamp createdAt;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Timestamp acquiredAt =  Timestamp.from(Instant.now());
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
