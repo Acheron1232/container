@@ -22,8 +22,9 @@ public class KitchenExceptionHandler {
     }
 
     @ExceptionHandler(OrderParserException.class)
-    public void handleOrderParserException(OrderParserException e) {
+    public ResponseEntity<String> handleOrderParserException(OrderParserException e) {
         log.warn(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
