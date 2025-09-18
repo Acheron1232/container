@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class DeliveryOrderService {
 
     private final DeliveryOrderRepository deliveryOrderRepository;
 
+    @Transactional
     public DeliveryOrder createOrder(ParsedDeliveryOrderDTO deliveryOrderDTO) {
         try {
             var order = deliveryOrderRepository.findById(deliveryOrderDTO.getId());
@@ -50,6 +52,7 @@ public class DeliveryOrderService {
         }
     }
 
+    @Transactional
     public List<DeliveryOrderDTO> getDeliveryOrders() {
         try {
             var deliveryOrders = deliveryOrderRepository.findAll().stream().map(DeliveryOrderDTO::of).toList();
