@@ -16,10 +16,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#  config:
-#    import: file:kitchen-server/.env[.properties]
 server:
   port: 8085
-
-#facility:
-#  id: ${KITCHEN_FACILITY_ID}
